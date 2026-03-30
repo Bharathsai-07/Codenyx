@@ -1,4 +1,6 @@
 import { useRole } from '../hooks/useRole'
+import { getLocaleForLanguage, useUiText } from '../translations'
+import AIChatWidget from './AIChatWidget'
 
 const MENTOR_DATA = {
   stats: [
@@ -21,18 +23,19 @@ const MENTOR_DATA = {
 
 export default function MentorDashboard() {
   const { userName, userImage } = useRole()
+  const { t, language } = useUiText()
 
   return (
     <div className="dashboard-page animate-fade-in">
       <header className="header">
         <div>
-          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Mentor Portal</h1>
-          <p>Welcome back, {userName} • {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</p>
+          <h1 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>{t('mentorPortal')}</h1>
+          <p>{t('studentWelcomeBack')}, {userName} • {new Date().toLocaleDateString(getLocaleForLanguage(language), { weekday: 'long', month: 'long', day: 'numeric' })}</p>
         </div>
         <div className="user-profile">
           <div className="flex flex-col" style={{ alignItems: 'flex-end' }}>
             <span style={{ fontWeight: 600 }}>{userName}</span>
-            <span className="badge badge-success" style={{ marginTop: '0.25rem' }}>Mentor</span>
+            <span className="badge badge-success" style={{ marginTop: '0.25rem' }}>{t('mentorBadge')}</span>
           </div>
           <div className="avatar">
             <img src={userImage} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -51,16 +54,16 @@ export default function MentorDashboard() {
 
       {/* Student Watchlist Table */}
       <div className="glass-card" style={{ marginBottom: '1.5rem' }}>
-        <h3 style={{ marginBottom: '1.5rem' }}>👥 Student Watchlist</h3>
+        <h3 style={{ marginBottom: '1.5rem' }}>👥 {t('studentWatchlist')}</h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', color: 'var(--text-dim)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                <th style={{ padding: '0.75rem 1rem' }}>Student</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Progress</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Status</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Weak Area</th>
-                <th style={{ padding: '0.75rem 1rem' }}>Actions</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('student')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('progress')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('status')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('weakArea')}</th>
+                <th style={{ padding: '0.75rem 1rem' }}>{t('actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -81,7 +84,7 @@ export default function MentorDashboard() {
                   <td style={{ padding: '1rem', color: 'var(--text-dim)' }}>{s.weakArea}</td>
                   <td style={{ padding: '1rem' }}>
                     <button className="btn" style={{ padding: '0.35rem 1rem', fontSize: '0.8rem', color: 'var(--primary)', background: 'rgba(99,102,241,0.1)', borderRadius: '6px' }}>
-                      Review
+                      {t('review')}
                     </button>
                   </td>
                 </tr>
@@ -93,7 +96,7 @@ export default function MentorDashboard() {
 
       {/* Pending Doubts */}
       <div className="glass-card">
-        <h3 style={{ marginBottom: '1.5rem' }}>❓ Pending Doubts</h3>
+        <h3 style={{ marginBottom: '1.5rem' }}>❓ {t('pendingDoubts')}</h3>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           {MENTOR_DATA.recentDoubts.map(d => (
             <div key={d.id} className="glass-card" style={{ background: 'rgba(255,255,255,0.03)' }}>
@@ -102,11 +105,13 @@ export default function MentorDashboard() {
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>{d.time}</span>
               </div>
               <p style={{ color: 'var(--text-main)', fontStyle: 'italic', fontSize: '0.9rem' }}>"{d.question}"</p>
-              <button className="btn btn-primary" style={{ width: '100%', padding: '0.5rem', marginTop: '1rem', fontSize: '0.85rem' }}>Answer Now</button>
+              <button className="btn btn-primary" style={{ width: '100%', padding: '0.5rem', marginTop: '1rem', fontSize: '0.85rem' }}>{t('answerNow')}</button>
             </div>
           ))}
         </div>
       </div>
+
+      <AIChatWidget role="mentor" />
     </div>
   )
 }

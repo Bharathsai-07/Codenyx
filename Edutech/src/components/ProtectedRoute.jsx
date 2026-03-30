@@ -1,6 +1,7 @@
 import { useAuth } from '@clerk/clerk-react'
 import { Navigate } from 'react-router-dom'
 import { useRole } from '../hooks/useRole'
+import { useUiText } from '../translations'
 
 /**
  * ProtectedRoute: Guards routes based on authentication and role.
@@ -11,12 +12,13 @@ import { useRole } from '../hooks/useRole'
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const { isSignedIn, isLoaded } = useAuth()
   const { role } = useRole()
+  const { t } = useUiText()
 
   if (!isLoaded) {
     return (
       <div className="loading-screen">
         <div className="loading-spinner"></div>
-        <p>Loading...</p>
+        <p>{t('loading')}</p>
       </div>
     )
   }

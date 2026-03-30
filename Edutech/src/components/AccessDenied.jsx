@@ -1,31 +1,32 @@
 import { useAuth } from '@clerk/clerk-react'
 import { useRole } from '../hooks/useRole'
 import { useNavigate } from 'react-router-dom'
+import { useUiText } from '../translations'
 
 export default function AccessDenied() {
   const { signOut } = useAuth()
   const { role } = useRole()
   const navigate = useNavigate()
+  const { t } = useUiText()
 
   return (
     <div className="access-denied-page">
       <div className="access-denied-card glass-card animate-fade-in">
         <div className="access-denied-icon">🚫</div>
-        <h1>Access Denied</h1>
+        <h1>{t('accessDeniedTitle')}</h1>
         <p className="access-denied-message">
-          Your current role is <span className="role-highlight">{role || 'student'}</span>. 
-          You don't have permission to access this section.
+          {t('accessDeniedLine1')} <span className="role-highlight">{role || t('student')}</span>. 
+          {t('accessDeniedLine2')}
         </p>
         <p className="access-denied-sub">
-          Only the platform administrator can change user roles from the Clerk Dashboard. 
-          Contact your admin to request elevated access.
+          {t('accessDeniedSub')}
         </p>
         <div className="access-denied-actions">
           <button className="btn btn-primary" onClick={() => navigate('/dashboard')}>
-            Go to My Dashboard
+            {t('goToDashboard')}
           </button>
           <button className="btn btn-outline" onClick={() => signOut()}>
-            Sign Out
+            {t('signOut')}
           </button>
         </div>
       </div>

@@ -1,25 +1,41 @@
 import { useClerk } from '@clerk/clerk-react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useRole } from '../hooks/useRole'
+import { useUiText } from '../translations'
 
 export default function Sidebar() {
   const { signOut } = useClerk()
   const navigate = useNavigate()
   const location = useLocation()
   const { role, userName, userImage } = useRole()
+  const { t } = useUiText()
 
-  const navItems = [
-    { id: 'dashboard', path: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['student', 'mentor', 'admin'] },
-    { id: 'lessons', path: '/lessons', label: 'Lessons', icon: '📚', roles: ['student', 'mentor', 'admin'] },
-    { id: 'practice', path: '/practice', label: 'Practice', icon: '✍️', roles: ['student'] },
-    { id: 'support', path: '/support', label: 'Support', icon: '💬', roles: ['student', 'mentor'] },
-    { id: 'students', path: '/students', label: 'My Students', icon: '👥', roles: ['mentor'] },
-    { id: 'analytics', path: '/analytics', label: 'Analytics', icon: '📈', roles: ['mentor', 'admin'] },
-    { id: 'users', path: '/users', label: 'Users', icon: '🛡️', roles: ['admin'] },
-    { id: 'settings', path: '/settings', label: 'Settings', icon: '⚙️', roles: ['admin'] },
+  const studentNav = [
+    { id: 'dashboard', path: '/dashboard', label: t('navDashboard'), icon: '' },
+    { id: 'lessons', path: '/lessons', label: t('navLessons'), icon: '' },
+    { id: 'progress', path: '/progress', label: t('navProgress'), icon: '' },
+    { id: 'chat', path: '/chat', label: t('navDoubts'), icon: '' },
+    { id: 'achievements', path: '/achievements', label: t('navAchievements'), icon: '' },
+    { id: 'profile', path: '/profile', label: t('navProfile'), icon: '' },
   ]
 
-  const filteredNav = navItems.filter(item => item.roles.includes(role))
+  const mentorNav = [
+    { id: 'dashboard', path: '/dashboard', label: t('navDashboard'), icon: '' },
+    { id: 'lessons', path: '/lessons', label: t('navLessons'), icon: '' },
+    { id: 'students', path: '/students', label: t('navMyStudents'), icon: '' },
+    { id: 'analytics', path: '/analytics', label: t('navAnalytics'), icon: '' },
+    { id: 'support', path: '/support', label: t('navSupport'), icon: '' },
+    { id: 'profile', path: '/profile', label: t('navProfile'), icon: '' },
+  ]
+
+  const adminNav = [
+    { id: 'dashboard', path: '/dashboard', label: t('navDashboard'), icon: '' },
+    { id: 'users', path: '/users', label: t('navUsers'), icon: '' },
+    { id: 'analytics', path: '/analytics', label: t('navAnalytics'), icon: '' },
+    { id: 'settings', path: '/settings', label: t('navSettings'), icon: '' },
+  ]
+
+  const navItems = role === 'admin' ? adminNav : role === 'mentor' ? mentorNav : studentNav
 
   const roleColors = {
     student: 'var(--primary)',
@@ -30,7 +46,7 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="logo-area" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
-        <div className="logo-icon">
+        {/* <div className="logo-icon">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
             <rect width="32" height="32" rx="8" fill="url(#sideGrad)" />
             <path d="M9 16L14 21L23 11" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -41,12 +57,12 @@ export default function Sidebar() {
               </linearGradient>
             </defs>
           </svg>
-        </div>
-        <h2 className="logo-text" style={{ fontSize: '1.25rem', margin: 0 }}>SmartLearn</h2>
+        </div> */}
+        <h2 className="logo-text" style={{ fontSize: '1.25rem', margin: 0 }}>{t('appName')}</h2>
       </div>
 
       <nav style={{ flex: 1 }}>
-        {filteredNav.map(item => (
+        {navItems.map(item => (
           <button
             key={item.id}
             className={`nav-link ${location.pathname === item.path ? 'active' : ''}`}
@@ -74,7 +90,7 @@ export default function Sidebar() {
           style={{ color: '#ef4444' }}
         >
           <span>🚪</span>
-          <span className="nav-text">Sign Out</span>
+          <span className="nav-text">{t('signOut')}</span>
         </button>
       </div>
     </aside>

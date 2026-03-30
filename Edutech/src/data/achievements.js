@@ -1,0 +1,86 @@
+/**
+ * Achievement / Badge definitions.
+ * condition(stats) returns true when the badge is earned.
+ */
+export const ACHIEVEMENTS = [
+  {
+    id: 'first-quiz',
+    title: 'First Steps',
+    description: 'Complete your first quiz',
+    icon: '🎯',
+    color: '#6366f1',
+    condition: (stats) => stats.totalQuizzes >= 1,
+  },
+  {
+    id: 'five-quizzes',
+    title: 'Quiz Warrior',
+    description: 'Complete 5 quizzes',
+    icon: '⚔️',
+    color: '#8b5cf6',
+    condition: (stats) => stats.totalQuizzes >= 5,
+  },
+  {
+    id: 'ten-quizzes',
+    title: 'Quiz Master',
+    description: 'Complete 10 quizzes',
+    icon: '👑',
+    color: '#f59e0b',
+    condition: (stats) => stats.totalQuizzes >= 10,
+  },
+  {
+    id: 'perfect-score',
+    title: 'Perfectionist',
+    description: 'Score 100% on any quiz',
+    icon: '💎',
+    color: '#ec4899',
+    condition: (stats) => stats.hasPerfectScore,
+  },
+  {
+    id: 'high-avg',
+    title: 'Honor Roll',
+    description: 'Maintain an average score above 80%',
+    icon: '🏆',
+    color: '#10b981',
+    condition: (stats) => stats.averageScore >= 80 && stats.totalQuizzes >= 3,
+  },
+  {
+    id: 'streak-3',
+    title: 'Consistent',
+    description: 'Complete 3 quizzes in a row with 60%+',
+    icon: '🔥',
+    color: '#ef4444',
+    condition: (stats) => stats.streak >= 3,
+  },
+  {
+    id: 'all-subjects',
+    title: 'Explorer',
+    description: 'Attempt quizzes in all 3 subjects',
+    icon: '🧭',
+    color: '#06b6d4',
+    condition: (stats) => stats.subjectsAttempted >= 3,
+  },
+  {
+    id: 'points-500',
+    title: 'Point Collector',
+    description: 'Earn 500 total points',
+    icon: '💰',
+    color: '#eab308',
+    condition: (stats) => stats.totalPoints >= 500,
+  },
+  {
+    id: 'points-1000',
+    title: 'Elite Scholar',
+    description: 'Earn 1000 total points',
+    icon: '🌟',
+    color: '#f97316',
+    condition: (stats) => stats.totalPoints >= 1000,
+  },
+  {
+    id: 'level-2',
+    title: 'Level Up',
+    description: 'Reach Level 2',
+    icon: '⬆️',
+    color: '#14b8a6',
+    condition: (stats) => stats.level >= 2,
+  },
+]

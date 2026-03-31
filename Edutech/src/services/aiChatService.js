@@ -2,7 +2,7 @@ const PROVIDER = import.meta.env.VITE_CHATBOT_PROVIDER || 'gemini'
 const MODEL = import.meta.env.VITE_CHATBOT_MODEL || 'gemini-1.5-flash'
 const API_URL = import.meta.env.VITE_CHATBOT_API_URL
   || (PROVIDER === 'gemini'
-    ? `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent`
+    ? `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`
     : 'https://api.openai.com/v1/chat/completions')
 
 function buildSystemPrompt(role, language) {
@@ -34,9 +34,15 @@ function resolveGeminiUrl(apiUrl, model, apiKey) {
   const hasModelPath = apiUrl.includes('/models/') && apiUrl.includes(':generateContent')
   const baseUrl = hasModelPath
     ? apiUrl
-    : `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent`
+    : `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
 
-  const url = new URL(baseUrl)
+  // Some models (and/or generateContent) are only supported on v1beta.
+  // If the configured URL points to v1, upgrade it to v1beta to avoid 404/NOT_FOUND.
+  const normalizedBaseUrl = baseUrl.includes('/v1/models/')
+    ? baseUrl.replace('/v1/models/', '/v1beta/models/')
+    : baseUrl
+
+  const url = new URL(normalizedBaseUrl)
   if (!url.searchParams.get('key')) {
     url.searchParams.set('key', apiKey)
   }
@@ -59,6 +65,10 @@ async function requestGemini({ apiKey, messages, role, language }) {
     },
   }
 
+  // #region agent log (debug)
+  fetch('http://127.0.0.1:7372/ingest/88b29611-25a3-4160-afcc-5904d747e6c4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'82c074'},body:JSON.stringify({sessionId:'82c074',runId:'gemini-debug',hypothesisId:'H2_payload_shape',location:'aiChatService.js:requestGemini:preFetch',message:'Gemini request URL + payload shape',data:{urlBase:url.split('?')[0],usesV1Beta:url.includes('/v1beta/'),contentsCount:payload.contents?.length||0,firstRoles:(payload.contents||[]).slice(0,4).map(c=>c.role)},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -69,6 +79,9 @@ async function requestGemini({ apiKey, messages, role, language }) {
 
   if (!response.ok) {
     const errorText = await response.text()
+    // #region agent log (debug)
+    fetch('http://127.0.0.1:7372/ingest/88b29611-25a3-4160-afcc-5904d747e6c4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'82c074'},body:JSON.stringify({sessionId:'82c074',runId:'gemini-debug',hypothesisId:'H3_http_error',location:'aiChatService.js:requestGemini:nonOk',message:'Gemini returned non-OK',data:{status:response.status,errorSnippet:String(errorText||'').replace(/key=[^&\\s]+/gi,'key=[REDACTED]').slice(0,400)},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     throw new Error(`AI API error: ${response.status} ${errorText}`)
   }
 
@@ -76,6 +89,9 @@ async function requestGemini({ apiKey, messages, role, language }) {
   const text = data?.candidates?.[0]?.content?.parts?.map((p) => p.text).join('\n').trim()
 
   if (!text) {
+    // #region agent log (debug)
+    fetch('http://127.0.0.1:7372/ingest/88b29611-25a3-4160-afcc-5904d747e6c4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'82c074'},body:JSON.stringify({sessionId:'82c074',runId:'gemini-debug',hypothesisId:'H4_response_parsing',location:'aiChatService.js:requestGemini:noText',message:'Gemini OK but parsing returned empty',data:{hasCandidates:Boolean(data?.candidates),candidatesLength:(data?.candidates||[]).length,hasParts:Boolean(data?.candidates?.[0]?.content?.parts)},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     throw new Error('No response content returned from Gemini API')
   }
 
@@ -118,6 +134,10 @@ async function requestOpenAICompatible({ apiKey, messages, role, language }) {
 
 export async function getAiChatReply({ messages, role = 'student', language = 'en' }) {
   const apiKey = import.meta.env.VITE_CHATBOT_API_KEY
+
+  // #region agent log (debug)
+  fetch('http://127.0.0.1:7372/ingest/88b29611-25a3-4160-afcc-5904d747e6c4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'82c074'},body:JSON.stringify({sessionId:'82c074',runId:'gemini-debug',hypothesisId:'H1_endpoint_or_model_mismatch',location:'aiChatService.js:getAiChatReply:precheck',message:'Gemini/OpenAI provider + config',data:{provider:PROVIDER,model:MODEL,apiUrlBase:(API_URL||'').split('?')[0],apiKeyPresent:Boolean(apiKey),messagesCount:Array.isArray(messages)?messages.length:0},timestamp:Date.now()})}).catch(()=>{});
+  // #endregion
 
   if (!apiKey) {
     throw new Error('Missing VITE_CHATBOT_API_KEY in .env')

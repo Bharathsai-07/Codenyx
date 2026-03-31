@@ -15,7 +15,17 @@ import ProgressPage from './pages/ProgressPage'
 import ChatPage from './pages/ChatPage'
 import AchievementsPage from './pages/AchievementsPage'
 import ProfileSettings from './pages/ProfileSettings'
+import AdminUsersPage from './pages/AdminUsersPage'
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage'
+import AdminProfilePage from './pages/AdminProfilePage'
+import AdminMentorRequestsPage from './pages/AdminMentorRequestsPage'
+import MentorshipApplicationModal from './components/MentorshipApplicationModal'
 import { useUiText } from './translations'
+import { createContext, useContext, useState } from 'react'
+
+const MentorshipContext = createContext()
+
+export const useMentorshipModal = () => useContext(MentorshipContext)
 
 function DashboardRouter() {
   const { role } = useRole()
@@ -24,15 +34,32 @@ function DashboardRouter() {
   return <StudentDashboard />
 }
 
-function AppLayout({ children }) {
+function AnalyticsRouter() {
+  const { role } = useRole()
   const { t } = useUiText()
 
+  if (role === 'admin') return <AdminAnalyticsPage />
+  return <ComingSoon title={t('navAnalytics')} />
+}
+
+function ProfileRouter() {
+  const { role } = useRole()
+
+  if (role === 'admin') return <AdminProfilePage />
+  return <ProfileSettings />
+}
+
+function AppLayout({ children }) {
+  const { t } = useUiText()
+  const [showMentorModal, setShowMentorModal] = useState(false)
+
   return (
-    <div className="platform-container">
-      <Sidebar />
-      <main className="main-content">
-        {children}
-        <footer className="app-footer flex justify-between">
+    <MentorshipContext.Provider value={{ showMentorModal, setShowMentorModal }}>
+      <div className="platform-container">
+        <Sidebar onMentorshipClick={() => setShowMentorModal(true)} />
+        <main className="main-content">
+          {children}
+          <footer className="app-footer flex justify-between">
           <p>&copy; {t('footerTagline')}</p>
           <div className="flex" style={{ gap: '1.5rem' }}>
             <a href="#">{t('footerSupport')}</a>
@@ -42,6 +69,11 @@ function AppLayout({ children }) {
         </footer>
       </main>
     </div>
+      <MentorshipApplicationModal
+        isOpen={showMentorModal}
+        onClose={() => setShowMentorModal(false)}
+      />
+    </MentorshipContext.Provider>
   )
 }
 
@@ -89,14 +121,14 @@ function App() {
 
       {/* Student: Learning Module */}
       <Route path="/lessons" element={
-        <ProtectedRoute allowedRoles={['student', 'mentor', 'admin']}>
+        <ProtectedRoute allowedRoles={['student']}>
           <AppLayout><LearningModule /></AppLayout>
         </ProtectedRoute>
       } />
 
       {/* Student: Topic Lesson */}
       <Route path="/learn/:topicId" element={
-        <ProtectedRoute allowedRoles={['student', 'mentor', 'admin']}>
+        <ProtectedRoute allowedRoles={['student']}>
           <AppLayout><TopicLesson /></AppLayout>
         </ProtectedRoute>
       } />
@@ -132,7 +164,7 @@ function App() {
       {/* Profile Settings — all roles */}
       <Route path="/profile" element={
         <ProtectedRoute>
-          <AppLayout><ProfileSettings /></AppLayout>
+          <AppLayout><ProfileRouter /></AppLayout>
         </ProtectedRoute>
       } />
 
@@ -152,20 +184,20 @@ function App() {
       {/* Mentor + Admin */}
       <Route path="/analytics" element={
         <ProtectedRoute allowedRoles={['mentor', 'admin']}>
-          <AppLayout><ComingSoon title={t('navAnalytics')} /></AppLayout>
+          <AppLayout><AnalyticsRouter /></AppLayout>
         </ProtectedRoute>
       } />
 
       {/* Admin only */}
       <Route path="/users" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AppLayout><ComingSoon title={t('manageUsers')} /></AppLayout>
+          <AppLayout><AdminUsersPage /></AppLayout>
         </ProtectedRoute>
       } />
 
-      <Route path="/settings" element={
+      <Route path="/mentor-requests" element={
         <ProtectedRoute allowedRoles={['admin']}>
-          <AppLayout><ComingSoon title={t('navSettings')} /></AppLayout>
+          <AppLayout><AdminMentorRequestsPage /></AppLayout>
         </ProtectedRoute>
       } />
 

@@ -14,7 +14,7 @@ export default function ProgressPage() {
 
       {stats.totalQuizzes === 0 ? (
         <div className="glass-card" style={{ textAlign: 'center', padding: '3rem' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div>
+          {/* <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📊</div> */}
           <h3>{t('noQuizData')}</h3>
           <p style={{ marginTop: '0.5rem' }}>{t('noQuizDataSub')}</p>
         </div>
@@ -43,7 +43,7 @@ export default function ProgressPage() {
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' }}>
             {/* Score Trend */}
             <div className="glass-card">
-              <h3 style={{ marginBottom: '1.5rem' }}>📉 {t('scoreTrend')}</h3>
+              {/* <h3 style={{ marginBottom: '1.5rem' }}>📉 {t('scoreTrend')}</h3> */}
               <div className="score-chart">
                 {stats.improvementData.map((d, i) => (
                   <div key={i} className="chart-bar-wrap">
@@ -61,7 +61,7 @@ export default function ProgressPage() {
 
             {/* Subject Breakdown */}
             <div className="glass-card">
-              <h3 style={{ marginBottom: '1.5rem' }}>📊 {t('subjectBreakdown')}</h3>
+              {/* <h3 style={{ marginBottom: '1.5rem' }}>📊 {t('subjectBreakdown')}</h3> */}
               {Object.entries(stats.subjectBreakdown).map(([name, data]) => (
                 <div key={name} style={{ marginBottom: '1.25rem' }}>
                   <div className="flex justify-between" style={{ marginBottom: '0.35rem' }}>
@@ -77,9 +77,9 @@ export default function ProgressPage() {
 
             {/* Weak Topics */}
             <div className="glass-card">
-              <h3 style={{ marginBottom: '1rem' }}>⚠️ {t('weakTopics')} <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>(Below 40%)</span></h3>
+              <h3 style={{ marginBottom: '1rem' }}> {t('weakTopics')} <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>(Below 40%)</span></h3>
               {stats.weakTopics.length === 0 ? (
-                <p style={{ color: 'var(--secondary)' }}>🎉 {t('noWeakTopics')}</p>
+                <p style={{ color: 'var(--secondary)' }}> {t('noWeakTopics')}</p>
               ) : (
                 stats.weakTopics.map(t => (
                   <div key={t.topicId} className="flex justify-between align-center" style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--surface-border)' }}>
@@ -95,7 +95,7 @@ export default function ProgressPage() {
 
             {/* Strong Topics */}
             <div className="glass-card">
-              <h3 style={{ marginBottom: '1rem' }}>💪 {t('strongTopics')} <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>(Above 80%)</span></h3>
+              <h3 style={{ marginBottom: '1rem' }}> {t('strongTopics')} <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>(Above 80%)</span></h3>
               {stats.strongTopics.length === 0 ? (
                 <p>{t('practiceAbove80')}</p>
               ) : (
@@ -114,7 +114,7 @@ export default function ProgressPage() {
 
           {/* Recent Results */}
           <div className="glass-card" style={{ marginTop: '1.5rem' }}>
-            <h3 style={{ marginBottom: '1rem' }}>🕐 {t('recentResults')}</h3>
+            <h3 style={{ marginBottom: '1rem' }}> {t('recentResults')}</h3>
             {stats.recentResults.map(r => (
               <div key={r.id} className="flex justify-between align-center" style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--surface-border)' }}>
                 <div>

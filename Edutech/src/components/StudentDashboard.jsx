@@ -4,10 +4,10 @@ import { getProgressStats, getCompletedTopicIds } from '../services/progressServ
 import { getAllTopics } from '../data/subjects'
 import { ACHIEVEMENTS } from '../data/achievements'
 import { getLocaleForLanguage, useUiText } from '../translations'
-import AIChatWidget from './AIChatWidget'
+import VideoCallWidget from './VideoCallWidget'
 
 export default function StudentDashboard() {
-  const { userName, userImage } = useRole()
+  const { userName, userImage, role } = useRole()
   const { t, language } = useUiText()
   const navigate = useNavigate()
   const stats = getProgressStats()
@@ -160,10 +160,11 @@ export default function StudentDashboard() {
               </button>
             </div>
           </div>
+
         </div>
       </div>
 
-      <AIChatWidget role="student" />
+      <VideoCallWidget userId={userName} userRole={role} userName={userName} />
     </div>
   )
 }

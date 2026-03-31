@@ -47,7 +47,7 @@ export function sendMessage(text) {
 }
 
 /** Simulates a mentor response after a short delay */
-export function simulateMentorReply() {
+export function simulateMentorReply(mentorName = 'Mentor') {
   return new Promise((resolve) => {
     const delay = 1000 + Math.random() * 2000
     setTimeout(() => {
@@ -56,7 +56,7 @@ export function simulateMentorReply() {
         id: (Date.now() + 1).toString(),
         text: MENTOR_RESPONSES[Math.floor(Math.random() * MENTOR_RESPONSES.length)],
         sender: 'mentor',
-        senderName: 'Dr. Sarah Lee',
+        senderName: mentorName,
         timestamp: new Date().toISOString(),
       }
       messages.push(reply)

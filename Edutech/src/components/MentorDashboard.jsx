@@ -1,6 +1,7 @@
 import { useRole } from '../hooks/useRole'
 import { getLocaleForLanguage, useUiText } from '../translations'
 import AIChatWidget from './AIChatWidget'
+import VideoCallWidget from './VideoCallWidget'
 
 const MENTOR_DATA = {
   stats: [
@@ -22,7 +23,7 @@ const MENTOR_DATA = {
 }
 
 export default function MentorDashboard() {
-  const { userName, userImage } = useRole()
+  const { userName, userImage, role } = useRole()
   const { t, language } = useUiText()
 
   return (
@@ -54,11 +55,11 @@ export default function MentorDashboard() {
 
       {/* Student Watchlist Table */}
       <div className="glass-card" style={{ marginBottom: '1.5rem' }}>
-        <h3 style={{ marginBottom: '1.5rem' }}>👥 {t('studentWatchlist')}</h3>
+        <h3 style={{ marginBottom: '1.5rem' }}>{t('studentWatchlist')}</h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ textAlign: 'left', color: 'var(--text-dim)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <tr style={{ textAlign: 'left', color: 'var(--text-main)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 <th style={{ padding: '0.75rem 1rem' }}>{t('student')}</th>
                 <th style={{ padding: '0.75rem 1rem' }}>{t('progress')}</th>
                 <th style={{ padding: '0.75rem 1rem' }}>{t('status')}</th>
@@ -69,7 +70,7 @@ export default function MentorDashboard() {
             <tbody>
               {MENTOR_DATA.studentWatchlist.map((s, i) => (
                 <tr key={i} style={{ borderBottom: '1px solid var(--surface-border)' }}>
-                  <td style={{ padding: '1rem', fontWeight: 500, color: '#fff' }}>{s.name}</td>
+                  <td style={{ padding: '1rem', fontWeight: 600, color: 'var(--text-main)' }}>{s.name}</td>
                   <td style={{ padding: '1rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <div style={{ width: '100px', height: '6px', background: 'var(--surface-border)', borderRadius: '3px' }}>
@@ -81,9 +82,9 @@ export default function MentorDashboard() {
                   <td style={{ padding: '1rem' }}>
                     <span className={`badge ${s.status === 'Excellent' || s.status === 'On Track' ? 'badge-success' : 'badge-warning'}`}>{s.status}</span>
                   </td>
-                  <td style={{ padding: '1rem', color: 'var(--text-dim)' }}>{s.weakArea}</td>
+                  <td style={{ padding: '1rem', color: 'var(--text-main)' }}>{s.weakArea}</td>
                   <td style={{ padding: '1rem' }}>
-                    <button className="btn" style={{ padding: '0.35rem 1rem', fontSize: '0.8rem', color: 'var(--primary)', background: 'rgba(99,102,241,0.1)', borderRadius: '6px' }}>
+                    <button className="btn" style={{ padding: '0.35rem 1rem', fontSize: '0.8rem', color: 'var(--text-main)', background: 'rgba(37, 99, 235, 0.12)', border: '1px solid rgba(37, 99, 235, 0.25)', borderRadius: '6px' }}>
                       {t('review')}
                     </button>
                   </td>
@@ -96,12 +97,12 @@ export default function MentorDashboard() {
 
       {/* Pending Doubts */}
       <div className="glass-card">
-        <h3 style={{ marginBottom: '1.5rem' }}>❓ {t('pendingDoubts')}</h3>
+        <h3 style={{ marginBottom: '1.5rem' }}> {t('pendingDoubts')}</h3>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
           {MENTOR_DATA.recentDoubts.map(d => (
             <div key={d.id} className="glass-card" style={{ background: 'rgba(255,255,255,0.03)' }}>
               <div className="flex justify-between align-center" style={{ marginBottom: '0.75rem' }}>
-                <span style={{ fontWeight: 600, color: '#fff' }}>{d.student}</span>
+                <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{d.student}</span>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>{d.time}</span>
               </div>
               <p style={{ color: 'var(--text-main)', fontStyle: 'italic', fontSize: '0.9rem' }}>"{d.question}"</p>
@@ -112,6 +113,7 @@ export default function MentorDashboard() {
       </div>
 
       <AIChatWidget role="mentor" />
+      <VideoCallWidget userId={userName} userRole={role} userName={userName} />
     </div>
   )
 }

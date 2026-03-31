@@ -24,6 +24,7 @@ const englishUi = {
   navAnalytics: 'Analytics',
   navSupport: 'Support',
   navUsers: 'Users',
+  navMentorRequests: 'Mentor Requests',
   navSettings: 'Settings',
   signOut: 'Sign Out',
 

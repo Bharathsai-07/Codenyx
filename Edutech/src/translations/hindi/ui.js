@@ -18,6 +18,7 @@ const hindiUi = {
   navAnalytics: 'विश्लेषण',
   navSupport: 'सहायता',
   navUsers: 'उपयोगकर्ता',
+  navMentorRequests: 'मेंटोर अनुरोध',
   navSettings: 'सेटिंग्स',
   signOut: 'साइन आउट',
 

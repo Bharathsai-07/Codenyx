@@ -18,6 +18,7 @@ const teluguUi = {
   navAnalytics: 'విశ్లేషణలు',
   navSupport: 'సహాయం',
   navUsers: 'వినియోగదారులు',
+  navMentorRequests: 'మెంటర్ అభ్యర్థనలు',
   navSettings: 'సెట్టింగ్స్',
   signOut: 'సైన్ అవుట్',
 

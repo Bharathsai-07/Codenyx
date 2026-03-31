@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { useUser } from '@clerk/clerk-react'
+import { useEffect } from 'react'
+import { useAuth, useUser } from '@clerk/clerk-react'
 import { getSelectedLanguage, getTextForLanguage, setSelectedLanguage, useUiText } from '../translations'
+import { getMentorRequests, getMyMentorRequestsFromApi } from '../services/mentorRequestService'
 
 const LANGUAGES = [
   { code: 'en', key: 'langEnglish', flag: '🇬🇧' },
@@ -10,13 +12,70 @@ const LANGUAGES = [
 
 export default function ProfileSettings() {
   const { user } = useUser()
+  const { getToken } = useAuth()
   const { t } = useUiText()
+
+  const role = String(user?.publicMetadata?.role || 'student').toLowerCase()
+  const rawMentorSubjects = user?.publicMetadata?.mentorSubjects
+    || user?.publicMetadata?.subjects
+    || user?.publicMetadata?.subject
+    || user?.publicMetadata?.subjectExpertise
+
+  const mentorSubjects = Array.isArray(rawMentorSubjects)
+    ? rawMentorSubjects.map((entry) => String(entry || '').trim()).filter(Boolean)
+    : typeof rawMentorSubjects === 'string'
+      ? rawMentorSubjects.split(',').map((entry) => entry.trim()).filter(Boolean)
+      : []
 
   const [firstName, setFirstName] = useState(user?.firstName || '')
   const [lastName, setLastName] = useState(user?.lastName || '')
   const [language, setLanguage] = useState(getSelectedLanguage)
   const [saved, setSaved] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [latestMentorApplication, setLatestMentorApplication] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const loadMentorApplication = async () => {
+      const userId = String(user?.id || '').trim()
+      const email = String(user?.primaryEmailAddress?.emailAddress || '').trim().toLowerCase()
+
+      if (!userId && !email) {
+        setLatestMentorApplication(null)
+        return
+      }
+
+      try {
+        const token = await getToken({ skipCache: true })
+        if (token) {
+          const requests = await getMyMentorRequestsFromApi(token)
+          if (!cancelled) {
+            setLatestMentorApplication(requests[0] || null)
+          }
+          return
+        }
+      } catch {
+        // Fallback to local requests below.
+      }
+
+      const fallback = getMentorRequests().find((request) => {
+        const reqClerkId = String(request.clerkId || '').trim()
+        const reqEmail = String(request.email || '').trim().toLowerCase()
+        return (userId && reqClerkId === userId) || (email && reqEmail === email)
+      }) || null
+
+      if (!cancelled) {
+        setLatestMentorApplication(fallback)
+      }
+    }
+
+    loadMentorApplication()
+
+    return () => {
+      cancelled = true
+    }
+  }, [getToken, user?.id, user?.primaryEmailAddress?.emailAddress])
 
   const handleSave = async () => {
     setSaving(true)
@@ -49,8 +108,28 @@ export default function ProfileSettings() {
               <h3>{user?.fullName || 'User'}</h3>
               <p style={{ fontSize: '0.85rem' }}>{user?.primaryEmailAddress?.emailAddress}</p>
               <span className="badge" style={{ marginTop: '0.5rem', background: 'rgba(99,102,241,0.1)', color: 'var(--primary)' }}>
-                {(user?.publicMetadata?.role || 'student').toUpperCase()}
+                {role.toUpperCase()}
               </span>
+              {role === 'mentor' && (
+                <div style={{ marginTop: '0.65rem' }}>
+                  {/* <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginBottom: '0.35rem' }}>Mentor Subjects</p> */}
+                  {/* {mentorSubjects.length > 0 ? (
+                    <div className="flex" style={{ flexWrap: 'wrap', gap: '0.35rem' }}>
+                      {mentorSubjects.map((subject) => (
+                        <span
+                          key={subject}
+                          className="badge"
+                          style={{ background: 'rgba(16,185,129,0.12)', color: 'rgb(5, 150, 105)' }}
+                        >
+                          {subject}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>No subject specialization set yet.</p>
+                  )} */}
+                </div>
+              )}
             </div>
           </div>
 
@@ -89,6 +168,18 @@ export default function ProfileSettings() {
           <button className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} onClick={handleSave} disabled={saving}>
             {saving ? t('saving') : saved ? t('saved') : t('saveChanges')}
           </button>
+
+          {latestMentorApplication && (
+            <div className="glass-card" style={{ marginTop: '1rem', padding: '0.9rem', background: 'rgba(255,255,255,0.55)' }}>
+              <p style={{ fontSize: '0.76rem', color: 'var(--text-dim)', marginBottom: '0.35rem' }}>Mentorship Application</p>
+              <p style={{ fontSize: '0.86rem', color: 'var(--text-main)', fontWeight: 600, textTransform: 'capitalize' }}>
+                Subject: {latestMentorApplication.subject || 'N/A'}
+              </p>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-dim)', textTransform: 'capitalize' }}>
+                Status: {latestMentorApplication.status || 'pending'}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Preferences */}

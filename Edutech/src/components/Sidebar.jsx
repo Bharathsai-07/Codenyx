@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useRole } from '../hooks/useRole'
 import { useUiText } from '../translations'
 
-export default function Sidebar() {
+export default function Sidebar({ onMentorshipClick }) {
   const { signOut } = useClerk()
   const navigate = useNavigate()
   const location = useLocation()
@@ -19,9 +19,12 @@ export default function Sidebar() {
     { id: 'profile', path: '/profile', label: t('navProfile'), icon: '' },
   ]
 
+  const mentorshipSection = role === 'student' ? [
+    { id: 'mentorship', path: '/dashboard', label: 'Apply for Mentorship', icon: '👨‍🏫', isMentorship: true }
+  ] : []
+
   const mentorNav = [
     { id: 'dashboard', path: '/dashboard', label: t('navDashboard'), icon: '' },
-    { id: 'lessons', path: '/lessons', label: t('navLessons'), icon: '' },
     { id: 'students', path: '/students', label: t('navMyStudents'), icon: '' },
     { id: 'analytics', path: '/analytics', label: t('navAnalytics'), icon: '' },
     { id: 'support', path: '/support', label: t('navSupport'), icon: '' },
@@ -31,8 +34,9 @@ export default function Sidebar() {
   const adminNav = [
     { id: 'dashboard', path: '/dashboard', label: t('navDashboard'), icon: '' },
     { id: 'users', path: '/users', label: t('navUsers'), icon: '' },
+    { id: 'mentor-requests', path: '/mentor-requests', label: t('navMentorRequests'), icon: '' },
     { id: 'analytics', path: '/analytics', label: t('navAnalytics'), icon: '' },
-    { id: 'settings', path: '/settings', label: t('navSettings'), icon: '' },
+    { id: 'profile', path: '/profile', label: t('navProfile'), icon: '' },
   ]
 
   const navItems = role === 'admin' ? adminNav : role === 'mentor' ? mentorNav : studentNav
@@ -72,6 +76,26 @@ export default function Sidebar() {
             <span className="nav-text">{item.label}</span>
           </button>
         ))}
+        
+        {mentorshipSection.length > 0 && (
+          <>
+            <div style={{ borderTop: '1px solid var(--surface-border)', margin: '1rem 0' }}></div>
+            {mentorshipSection.map(item => (
+              <button
+                key={item.id}
+                className="nav-link"
+                onClick={onMentorshipClick}
+                style={{ 
+                  background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1))',
+                  border: '1px solid rgba(16, 185, 129, 0.3)'
+                }}
+              >
+                <span>{item.icon}</span>
+                <span className="nav-text">{item.label}</span>
+              </button>
+            ))}
+          </>
+        )}
       </nav>
 
       <div style={{ borderTop: '1px solid var(--surface-border)', paddingTop: '1.25rem' }}>
@@ -80,7 +104,7 @@ export default function Sidebar() {
             <img src={userImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div className="nav-text" style={{ overflow: 'hidden' }}>
-            <p style={{ color: '#fff', fontWeight: 600, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userName}</p>
+            <p style={{ color: 'var(--text-main)', fontWeight: 700, fontSize: '0.85rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{userName}</p>
             <span style={{ fontSize: '0.7rem', color: roleColors[role], textTransform: 'capitalize' }}>{role}</span>
           </div>
         </div>
